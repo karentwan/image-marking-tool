@@ -42,9 +42,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.refresh_img()
 
     def slot_opendir(self):
-        if self.files is not None:
-            print('已经选中文件夹.....')
-            return
         print('opendir')
         dir = QtWidgets.QFileDialog.getExistingDirectory(caption='选择打开的文件夹',
                                                          directory='E:/water_meter/data/0-500')

@@ -24,6 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.list_widget.clicked.connect(self.slot_list_widget)
         self.img_widget = self.ui.show_img_widget
         self.label_show = self.ui.label
+        self.label_show.setAlignment(Qt.AlignCenter)
         self.files = None  # 所有图片的文件夹
         self.default_dir = None
         self.current_img_index = -1
@@ -55,9 +56,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.refresh_img()
 
     def slot_opendir(self):
-        if self.files is not None:
-            print('已经选中文件夹.....')
-            return
         print('opendir')
         dir = QtWidgets.QFileDialog.getExistingDirectory(caption='选择打开的文件夹',
                                                          directory='E:/water_meter/data/0-500')
@@ -90,8 +88,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def slot_next_btn(self):
         print('next image')
-        self.current_img_index += 1
-        self.current_img_index %= self.length
+        self.current_img_index = self.current_img_index + 1 if self.current_img_index < self.length - 1 else self.length - 1
+        # self.current_img_index += 1
+        # self.current_img_index %= self.length
         self.refresh_img()
 
     def slot_previous_btn(self):
@@ -113,7 +112,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print('path:{}'.format(path))
         # shutil.copy(self.files[self.current_img_index], path)
         cv2.imwrite(path, cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR))
-        str_infor = '复制成功！目的路径为:{}'.format(path)
+        str_infor = '已安排上!!!目的路径为:{}'.format(path)
         self.label_show.setText(str_infor)
 
 
