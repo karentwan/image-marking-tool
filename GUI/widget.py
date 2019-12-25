@@ -105,7 +105,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "图片选择器"))
         self.show_img_widget.setText(_translate("MainWindow", "show_img"))
         self.label.setText(_translate("MainWindow", "TextLabel"))
         self.selectbtn.setText(_translate("MainWindow", "选中"))
