@@ -89,8 +89,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def slot_next_btn(self):
         print('next image')
         self.current_img_index = self.current_img_index + 1 if self.current_img_index < self.length - 1 else self.length - 1
-        # self.current_img_index += 1
-        # self.current_img_index %= self.length
         self.refresh_img()
 
     def slot_previous_btn(self):
