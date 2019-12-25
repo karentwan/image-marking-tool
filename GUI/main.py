@@ -4,7 +4,7 @@ import sys
 import os
 import glob
 import shutil
-# import cv2
+import cv2
 from PyQt5.Qt import *
 
 
@@ -19,6 +19,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.previous_btn.clicked.connect(self.slot_previous_btn)
         self.ui.set_default_dirbtn.clicked.connect(self.slot_set_default_dir)
         self.ui.selectbtn.clicked.connect(self.slot_select_image)
+        self.ui.rotate.clicked.connect(self.slot_rotate)
         self.list_widget = self.ui.listWidget
         self.list_widget.clicked.connect(self.slot_list_widget)
         self.img_widget = self.ui.show_img_widget
@@ -30,11 +31,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.img_name = ''
         # 设置按钮快捷键
         self.set_shortcut()
+        self.img = None
 
     def set_shortcut(self):
         self.ui.next_btn.setShortcut('w')
         self.ui.previous_btn.setShortcut('e')
         self.ui.selectbtn.setShortcut('l')
+        self.ui.rotate.setShortcut('r')
+
+    def slot_rotate(self):
+        print('开始旋转...')
+        if self.img is None:
+            return
+        self.img = cv2.rotate(self.img, cv2.ROTATE_90_CLOCKWISE)
+        [h, w, c] = self.img.shape
+        q_img = QtGui.QImage(self.img.data, w, h, w * c, QtGui.QImage.Format_RGB888)
+        self.img_widget.setPixmap(QtGui.QPixmap.fromImage(q_img))
 
     def slot_list_widget(self, item):
         print('list widget...')
@@ -65,8 +77,15 @@ class MainWindow(QtWidgets.QMainWindow):
         path = self.files[self.current_img_index]
         self.img_name = path.split('\\')[-1]
         print('img_name:{}'.format(self.img_name))
-        pixmap = QtGui.QPixmap(path)
-        self.img_widget.setPixmap(pixmap)
+        ######################## 使用 opencv读取图片，然后使用QLabel显示图片
+        self.img = cv2.imread(path)
+        self.img = cv2.cvtColor(self.img, cv2.COLOR_BGR2RGB)
+        [h, w, c] = self.img.shape
+        q_img = QtGui.QImage(self.img.data, w, h, w * c, QtGui.QImage.Format_RGB888)
+        self.img_widget.setPixmap(QtGui.QPixmap.fromImage(q_img))
+        ########################## 下面是使用 QPixmap读取图片并显示
+        # pixmap = QtGui.QPixmap(path)
+        # self.img_widget.setPixmap(pixmap)
         self.label_show.setText('当前显示的图片为：{}'.format(self.img_name))
 
     def slot_next_btn(self):
@@ -92,7 +111,8 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         path = os.path.join(self.default_dir, self.img_name)
         print('path:{}'.format(path))
-        shutil.copy(self.files[self.current_img_index], path)
+        # shutil.copy(self.files[self.current_img_index], path)
+        cv2.imwrite(path, cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR))
         str_infor = '复制成功！目的路径为:{}'.format(path)
         self.label_show.setText(str_infor)
 

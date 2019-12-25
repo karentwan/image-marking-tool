@@ -35,7 +35,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.previousbtn.setShortcut('e')
         self.ui.savebtn.setShortcut('s')
 
-
     def slot_list_widget(self, item):
         print('list widget...')
         if self.list_widget.count() != 0:
