@@ -101,37 +101,37 @@ class ImageShow(QtWidgets.QLabel):
 
     def paintEvent(self, evt):
         super(ImageShow, self).paintEvent(evt)
-        print('开始重绘.....')
+        # print('开始重绘.....')
         painter = QtGui.QPainter(self)
         painter.setPen(QPen(Qt.red, 2, Qt.SolidLine))
         if self.shape.ltx != 0 and self.shape.lty != 0:  # 左上
             x = self.shape.ltx
             y = self.shape.lty
-            painter.drawEllipse(x-10, y-10, 5, 5)
+            painter.drawEllipse(x-3, y-3, 5, 5)
         if self.shape.rtx != 0 and self.shape.rty != 0:  # 右上
             x = self.shape.rtx
             y = self.shape.rty
-            painter.drawEllipse(x-10, y-10, 5, 5)
+            painter.drawEllipse(x-3, y-3, 5, 5)
         if self.shape.rbx != 0 and self.shape.rby != 0:  # 右下
             x = self.shape.rbx
             y = self.shape.rby
-            painter.drawEllipse(x-10, y-10, 5, 5)
+            painter.drawEllipse(x-3, y-3, 5, 5)
         if self.shape.lbx != 0 and self.shape.lby != 0:  # 左下
             x = self.shape.lbx
             y = self.shape.lby
-            painter.drawEllipse(x-10, y-10, 5, 5)
+            painter.drawEllipse(x-3, y-3, 5, 5)
 
     def keyPressEvent(self, evt):
         super(ImageShow, self).keyPressEvent(evt)
-        print('键盘按下事件产生')
+        # print('键盘按下事件产生')
 
     def keyReleaseEvent(self, evt):
         super(ImageShow, self).keyReleaseEvent(evt)
-        print('键盘释放事件产生')
+        # print('键盘释放事件产生')
 
     def mousePressEvent(self, evt):
         super(ImageShow, self).mousePressEvent(evt)
-        print('鼠标按下事件产生')
+        # print('鼠标按下事件产生')
         s = evt.windowPos()
         x = s.x()
         y = s.y()
@@ -159,4 +159,4 @@ class ImageShow(QtWidgets.QLabel):
 
     def mouseReleaseEvent(self, evt):
         super(ImageShow, self).mouseReleaseEvent(evt)
-        print('鼠标释放事件产生')
+        # print('鼠标释放事件产生')

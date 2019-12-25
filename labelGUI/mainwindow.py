@@ -3,7 +3,7 @@ import sys
 from labelGUI.widget import Ui_MainWindow
 import glob
 import os
-import cv2
+from PyQt5.Qt import *
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -61,16 +61,17 @@ class MainWindow(QtWidgets.QMainWindow):
         path = self.files[self.current_img_index]
         self.img_name = path.split('\\')[-1]
         print('img_name:{}'.format(self.img_name))
-        # img = cv2.imread(path)
-        # print('shape:{}'.format(img.shape))
-        # q_img = QtGui.QImage(img.data, img.shape[1], img.shape[0], QtGui.QImage.Format_RGB888)
-        # self.img_widget.setPixmap(QtGui.QPixmap.fromImage(pixmap))
         pixmap = QtGui.QPixmap(path)
         width = pixmap.width()
         height = pixmap.height()
+        self.ui.img_show.setFixedSize(width, height)
+        label_wdith = self.ui.img_show.width()
+        label_height = self.ui.img_show.height()
+        print('label_width:{}\tlabel_height:{}'.format(label_wdith, label_height))
         print('width:{}\theight:{}'.format(width, height))
         self.img_widget.set_WH(width, height)
         self.img_widget.setPixmap(pixmap)
+        self.label_show.setAlignment(Qt.AlignCenter)
         self.label_show.setText('当前显示的图片为：{}'.format(self.img_name))
 
     def slot_previous_btn(self):
@@ -82,6 +83,14 @@ class MainWindow(QtWidgets.QMainWindow):
         path = self.files[self.current_img_index]
         self.img_name = path.split('\\')[-1]
         pixmap = QtGui.QPixmap(path)
+        width = pixmap.width()
+        height = pixmap.height()
+        self.ui.img_show.setFixedSize(width, height)
+        label_wdith = self.ui.img_show.width()
+        label_height = self.ui.img_show.height()
+        print('label_width:{}\tlabel_height:{}'.format(label_wdith, label_height))
+        print('width:{}\theight:{}'.format(width, height))
+        self.img_widget.set_WH(width, height)
         self.img_widget.setPixmap(pixmap)
         self.label_show.setText('当前显示的图片为：{}'.format(self.img_name))
 

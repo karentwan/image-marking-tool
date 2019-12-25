@@ -2,8 +2,8 @@ import cv2
 import os
 
 
-input_img = r'H:\100_version2'
-output_txt = r'H:\100_version2'
+input_img = r'E:\water_meter\data\all_img'
+output_txt = r'E:\water_meter\data\label'
 image_name = '0.jpg'
 
 img = cv2.imread(os.path.join(input_img, image_name))
