@@ -1,8 +1,8 @@
 import cv2
 
 
-img_path = r'E:\water_meter\data\all_img/0.jpg'
-label = r'E:\water_meter\data\label/0.txt'
+img_path = r'E:\water_meter\data\new_500/445.jpg'
+label = r'E:\water_meter\data\label/445.txt'
 
 img = cv2.imread(img_path)
 [h, w, _] = img.shape
