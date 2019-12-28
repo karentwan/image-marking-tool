@@ -35,9 +35,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.img = None
 
     def set_shortcut(self):
-        self.ui.next_btn.setShortcut('w')
-        self.ui.previous_btn.setShortcut('e')
-        self.ui.selectbtn.setShortcut('l')
+        self.ui.next_btn.setShortcut('e')
+        self.ui.previous_btn.setShortcut('w')
+        self.ui.selectbtn.setShortcut('Return')
         self.ui.rotate.setShortcut('r')
 
     def slot_rotate(self):
