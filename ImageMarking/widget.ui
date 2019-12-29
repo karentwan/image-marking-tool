@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1025</width>
+    <width>1067</width>
     <height>852</height>
    </rect>
   </property>
@@ -65,7 +65,7 @@
             <normaloff>res/right.png</normaloff>res/right.png</iconset>
           </property>
           <property name="shortcut">
-           <string>Return</string>
+           <string>S</string>
           </property>
          </widget>
         </item>
@@ -132,6 +132,38 @@
        </layout>
       </item>
       <item>
+       <layout class="QHBoxLayout" name="horizontalLayout_6">
+        <item>
+         <widget class="QPushButton" name="markinbtn">
+          <property name="text">
+           <string>打标</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>res/marker.png</normaloff>res/marker.png</iconset>
+          </property>
+          <property name="shortcut">
+           <string>M</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="drag_imgbtn">
+          <property name="text">
+           <string>拖动图像</string>
+          </property>
+          <property name="icon">
+           <iconset>
+            <normaloff>res/drag.png</normaloff>res/drag.png</iconset>
+          </property>
+          <property name="shortcut">
+           <string>D</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <item>
          <widget class="QPushButton" name="opendirbtn">
@@ -141,6 +173,9 @@
           <property name="icon">
            <iconset>
             <normaloff>res/open.png</normaloff>res/open.png</iconset>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+O</string>
           </property>
          </widget>
         </item>
@@ -152,6 +187,9 @@
           <property name="icon">
            <iconset>
             <normaloff>res/setting.png</normaloff>res/setting.png</iconset>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+K</string>
           </property>
          </widget>
         </item>
@@ -169,7 +207,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1025</width>
+     <width>1067</width>
      <height>22</height>
     </rect>
    </property>

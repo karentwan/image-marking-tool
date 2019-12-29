@@ -6,6 +6,7 @@ import os
 from PyQt5.Qt import *
 import cv2
 import numpy as np
+from ImageMarking.model import Mode
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -25,6 +26,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.zoom_out_btn.clicked.connect(self.slot_zoom_out)
         self.list_widget = self.ui.listWidget
         self.list_widget.clicked.connect(self.slot_list_widget)
+        self.ui.markinbtn.clicked.connect(self.slot_marking)
+        self.ui.drag_imgbtn.clicked.connect(self.slot_drag)
         self.img_widget = self.ui.img_show
         self.label_show = self.ui.label
         self.files = None  # 所有图片的文件夹
@@ -32,28 +35,22 @@ class MainWindow(QtWidgets.QMainWindow):
         self.current_img_index = -1
         self.length = 0
         self.img_name = ''
-        # 设置软件快捷键
-        # self.set_shortcut()
         self.label_show.setAlignment(Qt.AlignCenter)
         self.img = None
         self.back_img = None
         self.scale_ratio = 1
         self.offset_x = 0
         self.offset_y = 0
+        self.translation_offset_x = 0
+        self.translation_offset_y = 0
 
-    # def set_shortcut(self):
-    #     self.ui.nextbtn.setShortcut('w')
-    #     self.ui.previousbtn.setShortcut('e')
-    #     self.ui.savebtn.setShortcut('s')
+    def slot_marking(self):
+        print('开始打标模式')
+        self.img_widget.set_mode(Mode.MARKING)
 
-    def slot_zoom_in(self):
-        print('图像放大')
-        [h, w, c] = self.back_img.shape
-        self.scale_ratio += MainWindow.BASE_RATIO
-        self.img = np.zeros(shape=(h, w, c), dtype=np.uint8)
-        self.img[...] = self.back_img[...]
-        self.img = cv2.resize(self.img, (int(w * self.scale_ratio), int(h * self.scale_ratio)))
-        self.zoom_refresh()
+    def slot_drag(self):
+        print('拖动图像的模式')
+        self.img_widget.set_mode(Mode.DRAG)
 
     def zoom_refresh(self):
         mouse_point = self.img_widget.get_mouse_point()
@@ -71,15 +68,36 @@ class MainWindow(QtWidgets.QMainWindow):
         self.img = self.img[offset_y:, offset_x:, :]
         print('offset x:{}\toffset y:{}'.format(offset_x, offset_y))
         print('scale ratio：{}'.format(self.scale_ratio))
-        [h, w, c] = self.img.shape
-        q_img = QtGui.QImage(self.img.data.tobytes(), w, h, w * c, QtGui.QImage.Format_RGB888)
-        # self.img_widget.set_WH(w, h)
-        self.img_widget.set_img(q_img)
+        # [h, w, c] = self.img.shape
+        # q_img = QtGui.QImage(self.img.data.tobytes(), w, h, w * c, QtGui.QImage.Format_RGB888)
+        # self.img_widget.set_img(q_img)
+        self.img_widget.set_img(self.img)
         self.img_widget.set_offset(self.offset_x, self.offset_y)
         self.img_widget.set_scale_ratio(self.scale_ratio)
 
+    def slot_zoom_in(self):
+        print('图像放大')
+        if self.img is None:
+            print('请先选择图片')
+            return
+        if self.translation_offset_x == 0:
+            self.translation_offset_x, self.translation_offset_y = self.img_widget.get_translation_offset()
+            print('self.translation_offset_x:{}\ttranslation_offset_y:{}'.format(self.translation_offset_x,
+                                                                                 self.translation_offset_y))
+            self.back_img = self.back_img[self.translation_offset_y:, self.translation_offset_x:, :]
+        # self.back_img = self.img_widget.cv_img
+        [h, w, c] = self.back_img.shape
+        self.scale_ratio += MainWindow.BASE_RATIO
+        self.img = np.zeros(shape=(h, w, c), dtype=np.uint8)
+        self.img[...] = self.back_img[...]
+        self.img = cv2.resize(self.img, (int(w * self.scale_ratio), int(h * self.scale_ratio)))
+        self.zoom_refresh()
+
     def slot_zoom_out(self):
         print('图像缩小')
+        if self.img is None:
+            print('请先选择图片先')
+            return
         [h, w, c] = self.back_img.shape
         # self.scale_count = 0 if self.scale_count <= 0 else self.scale_count - 1
         self.scale_ratio = 1 if self.scale_ratio <= 1 else self.scale_ratio - MainWindow.BASE_RATIO
@@ -107,16 +125,23 @@ class MainWindow(QtWidgets.QMainWindow):
         print(self.files)
         self.length = len(self.files)
         for item in self.files:
-            item_widget = QtWidgets.QListWidgetItem()
-            item_widget.setText(item)
-            self.list_widget.addItem(item_widget)
+            self.list_widget.addItem(item)
+
+    def clear_state(self):
+        self.scale_ratio = 1
+        self.offset_x = 0
+        self.offset_y = 0
+        self.translation_offset_x = 0
+        self.translation_offset_y = 0
+        self.img_widget.clear_shape()
 
     def refresh_img(self):
         if self.files is None:
             print('请选择文件夹')
             QtWidgets.QMessageBox.warning(self, '警告', self.tr('请选择文件夹!!!'), QMessageBox.Close)
             return
-        self.img_widget.clear_shape()
+        # self.img_widget.clear_shape()
+        self.clear_state()
         path = self.files[self.current_img_index]
         self.img_name = path.split('\\')[-1]
         print('img_name:{}'.format(self.img_name))
@@ -126,13 +151,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.back_img = np.zeros(shape=(h, w, c), dtype=np.uint8)
         self.back_img[...] = self.img[...]
         self.scale_ratio = 1
-        q_img = QtGui.QImage(self.img.data, w, h, w * c, QtGui.QImage.Format_RGB888)
-        label_wdith = self.ui.img_show.width()
-        label_height = self.ui.img_show.height()
-        print('label_width:{}\tlabel_height:{}'.format(label_wdith, label_height))
-        print('width:{}\theight:{}'.format(w, h))
         self.img_widget.set_WH(w, h)
-        self.img_widget.set_img(q_img)
+        # q_img = QtGui.QImage(self.img.data, w, h, w * c, QtGui.QImage.Format_RGB888)
+        # self.img_widget.set_img(q_img)
+        self.img_widget.set_img(self.img)
         self.label_show.setText('当前显示的图片为：{}'.format(self.img_name))
 
     def slot_next_btn(self):
@@ -147,12 +169,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def slot_set_default_dir(self):
         print('set default dir')
-        self.default_dir = QtWidgets.QFileDialog.getExistingDirectory(caption='选择打开的文件夹')
+        self.default_dir = QtWidgets.QFileDialog.getExistingDirectory(caption='选择要保存Txt文件的默认文件夹')
 
     def slot_save_txt(self):
         if self.default_dir is None:
             print('请选择保存txt的文件夹...')
             QtWidgets.QMessageBox.warning(self, '警告', self.tr('请选择要保存txt的文件夹!!'), QMessageBox.Close)
+            self.default_dir = QtWidgets.QFileDialog.getExistingDirectory(caption='选择要保存Txt文件的默认文件夹')
             return
         path = os.path.join(self.default_dir, '{}.txt'.format(self.img_name.split('.')[0]))
         infor_str = '保存成功！保存的路径在:{}'.format(path)

@@ -1,8 +1,11 @@
 import cv2
+import os
 
 
-img_path = r'E:\water_meter\data\test/13.jpg'
-label = r'E:\water_meter\data\test/13.txt'
+name = '00057'
+
+img_path = os.path.join(r'E:\water_meter\license_plate\cars_train/', '{}.jpg'.format(name))
+label = os.path.join(r'E:\water_meter\license_plate\label/', '{}.txt'.format(name))
 
 img = cv2.imread(img_path)
 [h, w, _] = img.shape

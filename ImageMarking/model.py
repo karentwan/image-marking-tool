@@ -1,5 +1,6 @@
 from PyQt5.Qt import *
 from PyQt5 import QtCore, QtGui, QtWidgets
+import numpy as np
 
 
 class Shape(object):
@@ -27,10 +28,23 @@ class Shape(object):
         self.offset_x = 0
         self.offset_y = 0
         self.scale_ratio = 1
+        self.temp_offset_x = 0
+        self.temp_offset_y = 0
+        self.translation_offset_x = 0
+        self.translation_offset_y = 0
 
     def set_offset(self, x, y):
         self.offset_x = x
         self.offset_y = y
+
+    def set_temp_offset(self, x, y):
+        self.temp_offset_x = x
+        self.temp_offset_y = y
+        # print('self.temp_offset_x:{}\tself.temp_offset_y:{}'.format(self.temp_offset_x, self.temp_offset_y))
+        if self.temp_offset_x < 0:
+            self.translation_offset_x -= self.temp_offset_x
+        if self.temp_offset_y < 0:
+            self.translation_offset_y -= self.temp_offset_y
 
     def set_scale_ratio(self, scale_ratio):
         self.scale_ratio = scale_ratio
@@ -46,6 +60,8 @@ class Shape(object):
         ltx /= self.scale_ratio
         lty += self.offset_y
         lty /= self.scale_ratio
+        ltx += self.translation_offset_x
+        lty += self.translation_offset_y
         print('offset_x:{}  offset_y:{} '
               ' scale ratio:{}  ltx:{} '
               ' lty:{} origin x:{}  origin y:{}'.format(self.offset_x, self.offset_y,
@@ -60,6 +76,8 @@ class Shape(object):
         rtx /= self.scale_ratio
         rty += self.offset_y
         rty /= self.scale_ratio
+        rtx += self.translation_offset_x
+        rty += self.translation_offset_y
         self.rtx_ = str(round(rtx / self.width * 1000000) / 1000000)
         self.rty_ = str(round(rty / self.height * 1000000) / 1000000)
 
@@ -70,6 +88,8 @@ class Shape(object):
         rbx /= self.scale_ratio
         rby += self.offset_y
         rby /= self.scale_ratio
+        rbx += self.translation_offset_x
+        rby += self.translation_offset_y
         self.rbx_ = str(round(rbx / self.width * 1000000) / 1000000)
         self.rby_ = str(round(rby / self.height * 1000000) / 1000000)
 
@@ -80,6 +100,8 @@ class Shape(object):
         lbx /= self.scale_ratio
         lby += self.offset_y
         lby /= self.scale_ratio
+        lbx += self.translation_offset_x
+        lby += self.translation_offset_y
         self.lbx_ = str(round(lbx / self.width * 1000000) / 1000000)
         self.lby_ = str(round(lby / self.height * 1000000) / 1000000)
 
@@ -105,6 +127,10 @@ class Shape(object):
         self.offset_x = 0
         self.offset_y = 0
         self.scale_ratio = 1
+        self.temp_offset_x = 0
+        self.temp_offset_y = 0
+        self.translation_offset_x = 0
+        self.translation_offset_y = 0
 
 
 class Point(object):
@@ -118,34 +144,71 @@ class Point(object):
         self.y = y
 
 
+class Mode(object):
+
+    MARKING = 0
+    DRAG = 1
+
+
 class ImageShow(QtWidgets.QLabel):
 
     def __init__(self, *args):
         QtWidgets.QLabel.__init__(self, *args)
-        self.setCursor(Qt.CrossCursor)
         self.shape = Shape()
         self.count = 0
-        self.img = None
+        self.cv_img = None   # opencv矩阵类型
+        self.img = None      # QImg, 要画的图
         self.setMouseTracking(True)
         self.mouse_point = Point()
-        # self.offset_x = 0
-        # self.offset_y = 0
-        # self.scale_ratio = 1
+        self.mode = Mode.DRAG
+        self.drag_flag = False
+
+    def get_translation_offset(self):
+        return self.shape.translation_offset_x, self.shape.translation_offset_y
+
+    def set_mode(self, mode):
+        self.mode = mode
+        if self.mode == Mode.MARKING:
+            self.setCursor(Qt.CrossCursor)
+        else:
+            self.setCursor(Qt.ArrowCursor)
 
     def set_scale_ratio(self, scale_ratio):
-        # self.scale_ratio = scale_ratio
         self.shape.set_scale_ratio(scale_ratio)
 
+    def get_offset(self):
+        return self.shape.offset_x, self.shape.offset_y
+
     def set_offset(self, x, y):
-        # self.offset_x = x
-        # self.offset_y = y
         self.shape.set_offset(x, y)
 
     def get_mouse_point(self):
         return self.mouse_point
 
-    def set_img(self, img):
-        self.img = img
+    def set_img(self, cv_img):
+        self.cv_img = cv_img
+        [h, w, c] = cv_img.shape
+        # print('img.shape:{}'.format(img.shape))
+        self.img = QtGui.QImage(cv_img.data.tobytes(), w, h, w * c, QtGui.QImage.Format_RGB888)
+        self.update()
+
+    def refresh_img(self):
+        print('开始拖动图像...')
+        [h, w, c] = self.cv_img.shape
+        print('offset x:{}\toffset y:{}'.format(self.shape.temp_offset_x, self.shape.temp_offset_y))
+        if self.shape.temp_offset_x < 0 and self.shape.temp_offset_y < 0:  # 左上移动
+            self.cv_img = self.cv_img[-self.shape.temp_offset_y:, -self.shape.temp_offset_x:, :]
+        elif self.shape.temp_offset_x < 0 and self.shape.temp_offset_y > 0:  # 左下
+            pass
+        elif self.shape.temp_offset_x > 0 and self.shape.temp_offset_y < 0:  # 右下
+            pass
+        elif self.shape.temp_offset_x > 0 and self.shape.temp_offset_y > 0:  # 右下
+            pass
+            # [h, w, c] = self.cv_back_img.shape
+            # self.cv_img = np.zeros(shape=(h - self.shape.offset_y, w - self.shape.offset_x, c), dtype=np.uint8)
+            # self.cv_img = self.cv_back_img[:h - self.shape.offset_y, :w - self.shape.offset_y, :]
+        [h, w, c] = self.cv_img.shape
+        self.img = QtGui.QImage(self.cv_img.data.tobytes(), w, h, w * c, QtGui.QImage.Format_RGB888)
         self.update()
 
     def clear_shape(self):
@@ -205,27 +268,37 @@ class ImageShow(QtWidgets.QLabel):
         s = evt.pos()
         x = s.x()
         y = s.y()
-        print('选中的坐标 x:{}\ty:{}'.format(s.x(), s.y()))
-        # self.setMouseTracking(True)
-        if self.count == 0:  # 左上
-            self.shape.set_lt(x, y)
-        elif self.count == 1:  # 右上
-            self.shape.set_rt(x, y)
-        elif self.count == 2:  # 右下
-            self.shape.set_rb(x, y)
-        elif self.count == 3:   # 左下
-            self.shape.set_lb(x, y)
-        self.count += 1
-        self.count %= 5  # 限制在4以内
+        if self.mode == Mode.MARKING:
+            print('选中的坐标 x:{}\ty:{}'.format(s.x(), s.y()))
+            if self.count == 0:  # 左上
+                self.shape.set_lt(x, y)
+            elif self.count == 1:  # 右上
+                self.shape.set_rt(x, y)
+            elif self.count == 2:  # 右下
+                self.shape.set_rb(x, y)
+            elif self.count == 3:   # 左下
+                self.shape.set_lb(x, y)
+            self.count += 1
+            self.count %= 5  # 限制在4以内
+        else:
+            self.drag_flag = True
         self.update()
 
     def mouseReleaseEvent(self, evt):
         super(ImageShow, self).mouseReleaseEvent(evt)
+        self.drag_flag = False
 
     def mouseMoveEvent(self, evt):
         super(ImageShow, self).mouseMoveEvent(evt)
         s = evt.pos()
         x = s.x()
         y = s.y()
-        # print('鼠标的坐标：{}/{}'.format(x, y))
+        if self.drag_flag is True:
+            # print('-------------开始移动图像')
+            offset_x = x - self.mouse_point.x
+            offset_y = y - self.mouse_point.y
+            if offset_x < 0 and offset_y < 0:
+                self.shape.set_temp_offset(offset_x, offset_y)
+                self.refresh_img()
         self.mouse_point.set_xy(x, y)
+
