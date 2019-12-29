@@ -119,7 +119,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.img_show.setText(_translate("MainWindow", "TextLabel"))
+        # self.img_show.setText(_translate("MainWindow", ""))
         self.label.setText(_translate("MainWindow", "TextLabel"))
         self.savebtn.setText(_translate("MainWindow", "保存"))
         self.savebtn.setShortcut(_translate("MainWindow", "S"))
@@ -132,7 +132,7 @@ class Ui_MainWindow(object):
         self.zoom_out_btn.setText(_translate("MainWindow", "缩小"))
         self.zoom_out_btn.setShortcut(_translate("MainWindow", "Ctrl+-"))
         self.markinbtn.setText(_translate("MainWindow", "打标"))
-        self.markinbtn.setShortcut(_translate("MainWindow", "M"))
+        self.markinbtn.setShortcut(_translate("MainWindow", "a"))
         self.drag_imgbtn.setText(_translate("MainWindow", "拖动图像"))
         self.drag_imgbtn.setShortcut(_translate("MainWindow", "D"))
         self.opendirbtn.setText(_translate("MainWindow", "打开文件夹"))
