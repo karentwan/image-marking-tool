@@ -62,10 +62,10 @@ class Shape(object):
         lty /= self.scale_ratio
         ltx += self.translation_offset_x
         lty += self.translation_offset_y
-        print('offset_x:{}  offset_y:{} '
-              ' scale ratio:{}  ltx:{} '
-              ' lty:{} origin x:{}  origin y:{}'.format(self.offset_x, self.offset_y,
-                                                        self.scale_ratio, self.ltx, self.lty, ltx, lty))
+        # print('offset_x:{}  offset_y:{} '
+        #       ' scale ratio:{}  ltx:{} '
+        #       ' lty:{} origin x:{}  origin y:{}'.format(self.offset_x, self.offset_y,
+        #                                                 self.scale_ratio, self.ltx, self.lty, ltx, lty))
         self.ltx_ = str(round(ltx / self.width * 1000000) / 1000000)
         self.lty_ = str(round(lty / self.height * 1000000) / 1000000)
 
