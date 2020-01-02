@@ -106,6 +106,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.default_dir is None:
             print('请设置默认文件夹...')
             QtWidgets.QMessageBox.warning(self, '警告', self.tr('请选择要默认保存文件夹!!!'), QMessageBox.Close)
+            self.default_dir = QtWidgets.QFileDialog.getExistingDirectory(caption='选择要保存Txt文件的默认文件夹')
             return
         path = os.path.join(self.default_dir, self.img_name)
         print('path:{}'.format(path))

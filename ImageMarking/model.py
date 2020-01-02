@@ -196,7 +196,7 @@ class ImageShow(QtWidgets.QLabel):
         print('开始拖动图像...')
         [h, w, c] = self.cv_img.shape
         print('offset x:{}\toffset y:{}'.format(self.shape.temp_offset_x, self.shape.temp_offset_y))
-        if self.shape.temp_offset_x < 0 and self.shape.temp_offset_y < 0:  # 左上移动
+        if self.shape.temp_offset_x <= 0 and self.shape.temp_offset_y <= 0:  # 左上移动
             self.cv_img = self.cv_img[-self.shape.temp_offset_y:, -self.shape.temp_offset_x:, :]
         elif self.shape.temp_offset_x < 0 and self.shape.temp_offset_y > 0:  # 左下
             pass
@@ -256,12 +256,27 @@ class ImageShow(QtWidgets.QLabel):
             x = self.shape.lbx
             y = self.shape.lby
             painter.drawEllipse(x-3, y-3, 5, 5)
+        # 画鼠标的十字线
+        if self.mode == Mode.MARKING:
+            w = self.width()
+            h = self.height()
+            x = self.mouse_point.x
+            y = self.mouse_point.y
+            if x > 0 and x < w and y > 0 and y < h:
+                painter.setPen(QPen(Qt.gray, 2, Qt.SolidLine))
+                painter.drawLine(QPointF(0, self.mouse_point.y), QPointF(self.width(), self.mouse_point.y))  # 水平线
+                painter.drawLine(QPointF(self.mouse_point.x, 0), QPointF(self.mouse_point.x, self.height()))  # 垂直线
 
     def keyPressEvent(self, evt):
         super(ImageShow, self).keyPressEvent(evt)
 
     def keyReleaseEvent(self, evt):
         super(ImageShow, self).keyReleaseEvent(evt)
+
+    def leaveEvent(self, evt):
+        super(ImageShow, self).leaveEvent(evt)
+        self.mouse_point.set_xy(0, 0)
+        print('鼠标移出控件')
 
     def mousePressEvent(self, evt):
         super(ImageShow, self).mousePressEvent(evt)
@@ -301,4 +316,5 @@ class ImageShow(QtWidgets.QLabel):
                 self.shape.set_temp_offset(offset_x, offset_y)
                 self.refresh_img()
         self.mouse_point.set_xy(x, y)
+        self.update()
 
