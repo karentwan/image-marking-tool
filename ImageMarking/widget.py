@@ -6,9 +6,8 @@
 #
 # WARNING! All changes made in this file will be lost!
 
-
+from PyQt5.Qt import *
 from PyQt5 import QtCore, QtGui, QtWidgets
-from ImageMarking.model import ImageShow
 
 
 class Ui_MainWindow(object):
@@ -22,12 +21,25 @@ class Ui_MainWindow(object):
         self.verticalLayout = QtWidgets.QVBoxLayout()
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName("verticalLayout")
-        # self.img_show = QtWidgets.QLabel(self.centralwidget)
-        self.img_show = ImageShow(self.centralwidget)
-        self.img_show.setMinimumSize(QtCore.QSize(800, 750))
-        self.img_show.setMaximumSize(QtCore.QSize(1280, 1280))
+        self.scrollArea = QtWidgets.QScrollArea(self.centralwidget)
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setObjectName("scrollArea")
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        self.img_show = ImageShow(self.scrollArea)
+        self.img_show.setEnabled(True)
+        self.img_show.setGeometry(QtCore.QRect(0, 0, 521, 771))
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.img_show.sizePolicy().hasHeightForWidth())
+        self.img_show.setSizePolicy(sizePolicy)
         self.img_show.setObjectName("img_show")
-        self.verticalLayout.addWidget(self.img_show)
+        self.scrollArea.setWidget(self.img_show)
+        self.scrollArea.setWidgetResizable(False)
+        self.scrollArea.setAlignment(Qt.AlignCenter)
+        self.verticalLayout.addWidget(self.scrollArea)
         self.label = QtWidgets.QLabel(self.centralwidget)
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
@@ -70,6 +82,7 @@ class Ui_MainWindow(object):
         self.zoom_out_btn.setObjectName("zoom_out_btn")
         self.horizontalLayout_4.addWidget(self.zoom_out_btn)
         self.verticalLayout_2.addLayout(self.horizontalLayout_4)
+
         self.horizontalLayout_6 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_6.setObjectName("horizontalLayout_6")
         self.markinbtn = QtWidgets.QPushButton(self.centralwidget)
@@ -78,12 +91,14 @@ class Ui_MainWindow(object):
         self.markinbtn.setIcon(icon5)
         self.markinbtn.setObjectName("markinbtn")
         self.horizontalLayout_6.addWidget(self.markinbtn)
-        self.drag_imgbtn = QtWidgets.QPushButton(self.centralwidget)
+
+        self.exit_mark_btn = QtWidgets.QPushButton(self.centralwidget)  # 退出打标按钮
         icon6 = QtGui.QIcon()
         icon6.addPixmap(QtGui.QPixmap("res/drag.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.drag_imgbtn.setIcon(icon6)
-        self.drag_imgbtn.setObjectName("drag_imgbtn")
-        self.horizontalLayout_6.addWidget(self.drag_imgbtn)
+        self.exit_mark_btn.setIcon(icon6)
+        self.exit_mark_btn.setObjectName("exit_mark_btn")
+        self.horizontalLayout_6.addWidget(self.exit_mark_btn)
+
         self.verticalLayout_2.addLayout(self.horizontalLayout_6)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
@@ -106,7 +121,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addLayout(self.verticalLayout_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1067, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1067, 23))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -119,7 +134,7 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "图片打标工具"))
-        # self.img_show.setText(_translate("MainWindow", ""))
+        self.img_show.setText(_translate("MainWindow", "TextLabel"))
         self.label.setText(_translate("MainWindow", "TextLabel"))
         self.savebtn.setText(_translate("MainWindow", "保存"))
         self.savebtn.setShortcut(_translate("MainWindow", "S"))
@@ -132,10 +147,13 @@ class Ui_MainWindow(object):
         self.zoom_out_btn.setText(_translate("MainWindow", "缩小"))
         self.zoom_out_btn.setShortcut(_translate("MainWindow", "Ctrl+-"))
         self.markinbtn.setText(_translate("MainWindow", "打标"))
-        self.markinbtn.setShortcut(_translate("MainWindow", "a"))
-        self.drag_imgbtn.setText(_translate("MainWindow", "拖动图像"))
-        self.drag_imgbtn.setShortcut(_translate("MainWindow", "D"))
+        self.markinbtn.setShortcut(_translate("MainWindow", "Q"))
+
+        self.exit_mark_btn.setText(_translate("MainWindow", "退出打标模式"))
+        self.exit_mark_btn.setShortcut(_translate("MainWindow", "Esc"))
+
         self.opendirbtn.setText(_translate("MainWindow", "打开文件夹"))
         self.opendirbtn.setShortcut(_translate("MainWindow", "Ctrl+O"))
         self.setdefaultdirbtn.setText(_translate("MainWindow", "设置保存默认文件夹"))
         self.setdefaultdirbtn.setShortcut(_translate("MainWindow", "Ctrl+K"))
+from model import ImageShow

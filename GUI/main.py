@@ -3,7 +3,6 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import sys
 import os
 import glob
-import shutil
 import cv2
 from PyQt5.Qt import *
 
@@ -25,7 +24,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.img_widget = self.ui.show_img_widget
         self.label_show = self.ui.label
         self.label_show.setAlignment(Qt.AlignCenter)
-        self.files = None  # 所有图片的文件夹
+        self.files = []  # 所有图片的文件夹
         self.default_dir = None
         self.current_img_index = -1
         self.length = 0
@@ -44,7 +43,7 @@ class MainWindow(QtWidgets.QMainWindow):
         print('开始旋转...')
         if self.img is None:
             return
-        self.img = cv2.rotate(self.img, cv2.ROTATE_90_CLOCKWISE)
+        self.img = cv2.rotate(self.img, cv2.ROTATE_90_COUNTERCLOCKWISE)
         [h, w, c] = self.img.shape
         q_img = QtGui.QImage(self.img.data, w, h, w * c, QtGui.QImage.Format_RGB888)
         self.img_widget.setPixmap(QtGui.QPixmap.fromImage(q_img))
@@ -61,7 +60,9 @@ class MainWindow(QtWidgets.QMainWindow):
                                                          directory='E:/water_meter/data/0-500')
         print(dir)
         # 读取文件并按照文件名里面的数字大小排序
-        self.files = sorted(glob.glob('{}/*'.format(dir)), key=lambda x: int(x.split('\\')[-1].split('.')[0]))
+        extentions = ['jpg', 'jpeg', 'png']
+        for item in extentions:
+            self.files.extend(glob.glob('{}/*.{}'.format(dir, item)))
         print(self.files)
         self.length = len(self.files)
         for item in self.files:
@@ -73,7 +74,7 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QMessageBox.warning(self, '警告', self.tr('请选择文件夹!!!'), QMessageBox.Close)
             return
         path = self.files[self.current_img_index]
-        self.img_name = path.split('\\')[-1]
+        self.img_name = os.path.split(path)[-1]
         print('img_name:{}'.format(self.img_name))
         ######################## 使用 opencv读取图片，然后使用QLabel显示图片
         self.img = cv2.imread(path)
@@ -81,9 +82,6 @@ class MainWindow(QtWidgets.QMainWindow):
         [h, w, c] = self.img.shape
         q_img = QtGui.QImage(self.img.data, w, h, w * c, QtGui.QImage.Format_RGB888)
         self.img_widget.setPixmap(QtGui.QPixmap.fromImage(q_img))
-        ########################## 下面是使用 QPixmap读取图片并显示
-        # pixmap = QtGui.QPixmap(path)
-        # self.img_widget.setPixmap(pixmap)
         self.label_show.setText('当前显示的图片为：{}'.format(self.img_name))
 
     def slot_next_btn(self):
@@ -94,7 +92,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def slot_previous_btn(self):
         print('previous image')
-        self.current_img_index = self.current_img_index - 1 if self.current_img_index >= 0 else 0
+        self.current_img_index = self.current_img_index - 1 if self.current_img_index > 0 else 0
         self.refresh_img()
 
     def slot_set_default_dir(self):
@@ -110,10 +108,10 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         path = os.path.join(self.default_dir, self.img_name)
         print('path:{}'.format(path))
-        # shutil.copy(self.files[self.current_img_index], path)
         cv2.imwrite(path, cv2.cvtColor(self.img, cv2.COLOR_RGB2BGR))
         str_infor = '已安排上!!!目的路径为:{}'.format(path)
         self.label_show.setText(str_infor)
+        self.slot_next_btn()
 
 
 if __name__ == '__main__':
