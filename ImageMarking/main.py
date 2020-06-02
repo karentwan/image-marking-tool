@@ -32,7 +32,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.label_show = self.ui.label
         self.label_show.setText('当前显示的图片:')
         self.scrollArea = self.ui.scrollArea
-        self.files = None  # 所有图片的文件夹
+        self.files = []
         self.default_dir = None
         self.current_img_index = -1
         self.length = 0
@@ -96,7 +96,9 @@ class MainWindow(QtWidgets.QMainWindow):
                                                          directory='E:/experimental')
         print(dir)
         # 读取文件并按照文件名里面的数字大小排序
-        self.files = sorted(glob.glob('{}/*'.format(dir)), key=lambda x: int(x.split('\\')[-1].split('.')[0]))
+        extentions = ['jpg', 'jpeg', 'png']
+        for item in extentions:
+            self.files.extend(glob.glob('{}/*.{}'.format(dir, item)))
         print(self.files)
         self.length = len(self.files)
         for item in self.files:
